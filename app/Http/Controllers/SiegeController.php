@@ -4,22 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\Salle;
 use App\Models\Siege;
+use App\Services\SiegeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SiegeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected SiegeService $siegeService;
+
+    public function __construct(SiegeService $siegeService)
     {
-        //
+        $this->siegeService = $siegeService;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function index()
+    {
+        $sieges = $this->siegeService->all();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $sieges
+        ], 200);
+    }
+
     public function store(Request $request , $salle_id)
     {
 
@@ -36,45 +43,81 @@ class SiegeController extends Controller
             ], 404);
         }
 
-        $request->validate([
+        $data = $request->validate([
             'salle_id' => $salle_id,
             'numero' => 'required|integer',
             'type' => 'in:solo,couple'
         ]);
 
-        $siege = Siege::create([
-            'salle_id' => $request->salle_id,
-            'numero' => $request->numero,
-            'type' => $request->type,
-        ]);
+        $data['admin_id'] = auth('api')->id();
+        $siege = $this->siegeService->create($data);
+
+        if (!$siege instanceof Siege) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to create siege'
+            ],500);
+        }
 
         return response()->json([
-            'message' => 'Siège ajouté avec succès',
-            'siege' => $siege
+            'status' => 'success',
+            'data' => $siege
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(int $id)
     {
-        //
+        $siege = $this->siegeService->find($id);
+
+        if (!$siege instanceof Siege) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'siege not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $siege
+        ], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
-        //
+        $data = $request->validate([
+            'numero' => 'required|integer',
+            'type' => 'in:solo,couple'
+        ]);
+
+        $result = $this->siegeService->update($data, $id);
+
+        if ($result <= 0) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to update siege'
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'siege updated successfully'
+        ],200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
-        //
+        $result = $this->siegeService->delete($id);
+
+        if (!is_bool($result)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to delete siege'
+            ],500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'siege deleted successfully'
+        ], 200);
     }
 }
