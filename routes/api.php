@@ -1,9 +1,6 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\FilmController;
-use App\Http\Controllers\SalleContoller;
-use App\Http\Controllers\SiegeController;
+use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,18 +19,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get("/users" , [AuthController::class , "index"]);
-Route::post("/register" , [AuthController::class , "store"]);
-
-Route::group(['middleware'=>['auth:sanctum']], function(){
-    Route::post("/film" , [FilmController::class , "store"]);
+Route::middleware([JwtMiddleware::class])->group(function () {
+    Route::apiResource('users', \App\Http\Controllers\UserController::class);
+    Route::apiResource('film', \App\Http\Controllers\FilmController::class);
+    Route::apiResource('salle', \App\Http\Controllers\SalleController::class);
+    Route::apiResource('siege', \App\Http\Controllers\SiegeController::class);
 });
 
-Route::group(['middleware'=>['auth:sanctum']], function(){
-    Route::post("/salle" , [SalleContoller::class , "store"]);
-});
-
-
-Route::group(['middleware'=>['auth:sanctum']], function(){
-    Route::post('/salles/{salle_id}/sieges', [SiegeController::class, 'store']);
-});
+// Route::get('users', [UserController::class, 'index']);
