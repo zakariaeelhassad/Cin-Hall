@@ -19,8 +19,8 @@ return new class extends Migration
             $table->enum('type', ['Normale', 'VIP']);
             $table->timestamps();
 
-            $table->foreign('salle_id')->references('id')->on('salle')->onDelete('cascade');
-            $table->foreign('film_id')->references('id')->on('film')->onDelete('cascade');
+            $table->foreign('salle_id')->references('id')->on('salles')->onDelete('cascade');
+            $table->foreign('film_id')->references('id')->on('films')->onDelete('cascade');
         });
     }
 

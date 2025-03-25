@@ -41,6 +41,7 @@ class FilmController extends Controller
         ]);
 
         $data['admin_id'] = auth('api')->id();
+        
         $film = $this->filmService->create($data);
 
         if (!$film instanceof Film) {
@@ -109,7 +110,7 @@ class FilmController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to delete film'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            ], 500);
         }
 
         return response()->json([

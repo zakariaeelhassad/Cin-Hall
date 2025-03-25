@@ -19,11 +19,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+Route::apiResource('users', \App\Http\Controllers\UserController::class);
 Route::middleware([JwtMiddleware::class])->group(function () {
-    Route::apiResource('users', \App\Http\Controllers\UserController::class);
-    Route::apiResource('film', \App\Http\Controllers\FilmController::class);
+    Route::apiResource('filme', \App\Http\Controllers\FilmController::class);
     Route::apiResource('salle', \App\Http\Controllers\SalleController::class);
     Route::apiResource('siege', \App\Http\Controllers\SiegeController::class);
+    Route::apiResource('seance', \App\Http\Controllers\SeanceController::class);
 });
+
 
 // Route::get('users', [UserController::class, 'index']);
