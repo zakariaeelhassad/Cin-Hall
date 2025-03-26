@@ -2,27 +2,19 @@
 
 namespace App\Services;
 
-use App\Repositories\FilmRepository;
-use Illuminate\Support\Facades\Auth;
+use App\Repositories\ReservationRepository;
+use App\Repositories\SalleRepository;
 
-class FilmService
+class ReservationService
 {
-    private FilmRepository $repository;
+    private ReservationRepository $repository;
 
-    public function __construct(FilmRepository $repository) {
+    public function __construct(ReservationRepository $repository) {
         $this->repository = $repository;
     }
 
     public function create(array $data)
     {
-        if (Auth::user()->role !== 'admin') {
-            return response()->json([
-                'message' => 'Vous n\'êtes pas autorisé à ajouter un Salle.'
-            ], 403); 
-        }
-
-        $data['admin_id'] = auth('api')->id();
-
         return $this->repository->create($data);
     }
 

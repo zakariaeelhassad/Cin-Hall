@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\SalleRepository;
+use Illuminate\Support\Facades\Auth;
 
 class SalleService
 {
@@ -14,6 +15,14 @@ class SalleService
 
     public function create(array $data)
     {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Vous n\'êtes pas autorisé à ajouter un Salle.'
+            ], 403); 
+        }
+
+        $data['admin_id'] = auth('api')->id();
+        
         return $this->repository->create($data);
     }
 

@@ -29,30 +29,12 @@ class SeanceController extends Controller
 
     public function store(Request $request , $salle_id , $film_id)
     {
-
-        if (Auth::user()->role !== 'admin') {
-            return response()->json([
-                'message' => 'Vous n\'êtes pas autorisé à ajouter un seance.'
-            ], 403); 
-        }
-
-        $salle = Salle::find($salle_id);
-        $film = Salle::find($film_id);
-        if (!$salle || !$film) {
-            return response()->json([
-                'message' => 'Salle ou film non trouvée.'
-            ], 404);
-        }
-
         $data = $request->validate([
-            'salle_id' => $salle_id,
-            'film_id' => $film_id,
             'date_heure' => 'required|date',
             'type' => 'in:VIP,normale'
         ]);
 
-        $data['admin_id'] = auth('api')->id();
-        $seance = $this->seanceService->create($data);
+        $seance = $this->seanceService->create($data , $salle_id, $film_id);
 
         if (!$seance instanceof Seance) {
             return response()->json([

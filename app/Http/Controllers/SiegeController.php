@@ -30,27 +30,13 @@ class SiegeController extends Controller
     public function store(Request $request , $salle_id)
     {
 
-        if (Auth::user()->role !== 'admin') {
-            return response()->json([
-                'message' => 'Vous n\'êtes pas autorisé à ajouter un Salle.'
-            ], 403); 
-        }
-
-        $salle = Salle::find($salle_id);
-        if (!$salle) {
-            return response()->json([
-                'message' => 'Salle non trouvée.'
-            ], 404);
-        }
 
         $data = $request->validate([
-            'salle_id' => $salle_id,
             'numero' => 'required|integer',
             'type' => 'in:solo,couple'
         ]);
 
-        $data['admin_id'] = auth('api')->id();
-        $siege = $this->siegeService->create($data);
+        $siege = $this->siegeService->create($data , $salle_id);
 
         if (!$siege instanceof Siege) {
             return response()->json([

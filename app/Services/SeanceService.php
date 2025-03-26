@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Film;
+use App\Models\Salle;
 use App\Repositories\SeanceRepository;
+use Illuminate\Support\Facades\Auth;
 
 class SeanceService
 {
@@ -12,8 +15,25 @@ class SeanceService
         $this->repository = $repository;
     }
 
-    public function create(array $data)
+    public function create(array $data , $salle_id, $film_id)
     {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Vous n\'êtes pas autorisé à ajouter un seance.'
+            ], 403); 
+        }
+
+        $salle = Salle::find($salle_id);
+        $film = Film::find($film_id);
+
+        if (!$salle || !$film) {
+            return null;
+        }
+
+        $data['salle_id'] = $salle_id;
+        $data['film_id'] = $film_id;
+        $data['admin_id'] = auth('api')->id();
+
         return $this->repository->create($data);
     }
 

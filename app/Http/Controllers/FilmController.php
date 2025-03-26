@@ -40,8 +40,6 @@ class FilmController extends Controller
             'genre' => 'required|string',
         ]);
 
-        $data['admin_id'] = auth('api')->id();
-        
         $film = $this->filmService->create($data);
 
         if (!$film instanceof Film) {

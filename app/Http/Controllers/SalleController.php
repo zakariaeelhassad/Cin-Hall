@@ -26,14 +26,8 @@ class SalleController extends Controller
         ], 200);
     }
 
-    public function store(Request $request , $salle_id)
+    public function store(Request $request)
     {
-
-        if (Auth::user()->role !== 'admin') {
-            return response()->json([
-                'message' => 'Vous n\'êtes pas autorisé à ajouter un Salle.'
-            ], 403); 
-        }
 
         $data = $request->validate([
             'nom' => 'required|string',
@@ -41,7 +35,6 @@ class SalleController extends Controller
             'type' => 'in:Normale,VIP'
         ]);
 
-        $data['admin_id'] = auth('api')->id();
         $Salle = $this->salleService->create($data);
 
         if (!$Salle instanceof Salle) {
