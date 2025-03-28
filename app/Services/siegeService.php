@@ -2,9 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Salle;
 use App\Repositories\SiegeRepository;
-use Illuminate\Support\Facades\Auth;
 
 class SiegeService
 {
@@ -14,22 +12,8 @@ class SiegeService
         $this->repository = $repository;
     }
 
-    public function create(array $data , $salle_id)
+    public function create(array $data )
     {
-        if (Auth::user()->role !== 'admin') {
-            return response()->json([
-                'message' => 'Vous n\'êtes pas autorisé à ajouter un Salle.'
-            ], 403); 
-        }
-
-        $salle = Salle::find($salle_id);
-        if (!$salle) {
-            return response()->json([
-                'message' => 'Salle non trouvée.'
-            ], 404);
-        }
-        $data['salle_id'] = $salle_id; 
-        $data['admin_id'] = auth('api')->id();
         return $this->repository->create($data);
     }
 
@@ -51,5 +35,21 @@ class SiegeService
     public function find(int $id)
     {
         return $this->repository->find($id);
+    }
+
+    public function generateSiegesForSalle($salle)
+    {
+        $sieges = [];
+
+        for ($i = 1; $i <= $salle->capacite; $i++) {
+            $type = ($salle->type_seance === 'VIP' && $i % 2 == 1) ? 'couple' : 'solo';
+            $sieges[] = $this->repository->create([
+                'salle_id' => $salle->id,
+                'numero' => 'S' . $i,
+                'type' => $type,
+            ]);
+        }
+
+        return $sieges;
     }
 }

@@ -9,43 +9,25 @@ class Reservation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['seats', 'expiration_time', 'user_id', 'seance_id' , 'status'];
+    protected $fillable = ['user_id', 'siege_id', 'seance_id', 'status'];
 
-    protected $casts = [
-        'seats' => 'array', 
-        'expiration_time' => 'datetime', 
-    ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
+    //    public function spectateur()
+    //    {
+    //        return $this->belongsTo(User::class, 'spectateur_id');
+    //    }
+    
+        public function user()
+        {
+            return $this->belongsTo(User::class, 'user_id');  // Assure-toi que 'user_id' est utilisé ici
+        }
+    
+        public function siege()
+        {
+            return $this->belongsTo(Siege::class);
+        }
+    
+        public function seance()
+        {
+            return $this->belongsTo(Seance::class );
+        }
     }
-
-    public function session()
-    {
-        return $this->belongsTo(Seance::class);
-    }
-
-    public function isExpired()
-    {
-        return $this->expiration_time < now();
-    }
-
-    public function confirm()
-    {
-        $this->status = 'confirmed';
-        $this->save();
-    }
-
-    public function cancel()
-    {
-        $this->status = 'cancelled';
-        $this->save();
-    }
-
-    public function markAsPending()
-    {
-        $this->status = 'pending';
-        $this->save();
-    }
-}

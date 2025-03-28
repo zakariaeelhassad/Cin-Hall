@@ -14,4 +14,9 @@ class Salle extends Model
         'capacite',
         'type',
     ];
+
+    public function sieges()
+    {
+        return $this->hasMany(Siege::class);
+    }
 }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Film;
 use Illuminate\Http\Request;
 use App\Services\FilmService;
-use Symfony\Component\HttpFoundation\Response;
 
 class FilmController extends Controller
 {
@@ -104,12 +103,12 @@ class FilmController extends Controller
     {
         $result = $this->filmService->delete($id);
 
-        if (!is_bool($result)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete film'
-            ], 500);
-        }
+        // if (!is_bool($result)) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Failed to delete film'
+        //     ], 500);
+        // }
 
         return response()->json([
             'status' => 'success',

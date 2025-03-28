@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create("sieges" , function(Blueprint $table){
             $table->id();
             $table->foreignId("salle_id")->constrained("salles")->onDelete("cascade");
-            $table->integer("numero");
+            $table->string('numero');
             $table->enum('type', ['solo', 'couple']);
             $table->timestamps();
         });

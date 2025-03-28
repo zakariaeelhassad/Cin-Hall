@@ -4,16 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Salle;
 use App\Services\SalleService;
+use App\Services\SiegeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SalleController extends Controller
 {
-    protected SalleService $salleService;
+    protected SalleService $salleService;   
+    protected SiegeService $siegeService;   
 
-    public function __construct(SalleService $salleService)
+    public function __construct(SalleService $salleService , SiegeService $siegeService)
     {
         $this->salleService = $salleService;
+        $this->siegeService = $siegeService;
     }
 
     public function index()
@@ -36,6 +39,7 @@ class SalleController extends Controller
         ]);
 
         $Salle = $this->salleService->create($data);
+        $sieges = $this->siegeService->generateSiegesForSalle($Salle);
 
         if (!$Salle instanceof Salle) {
             return response()->json([
@@ -46,7 +50,8 @@ class SalleController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $Salle
+            'data' => $Salle,
+            'data' => $sieges
         ], 201);
     }
 
@@ -94,12 +99,12 @@ class SalleController extends Controller
     {
         $result = $this->salleService->delete($id);
 
-        if (!is_bool($result)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete Salle'
-            ],500);
-        }
+        // if (!is_bool($result)) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Failed to delete Salle'
+        //     ],500);
+        // }
 
         return response()->json([
             'status' => 'success',

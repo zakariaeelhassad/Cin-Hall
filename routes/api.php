@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SeanceController;
 use App\Http\Controllers\SiegeController;
@@ -35,10 +36,25 @@ Route::middleware([JwtMiddleware::class])->group(function () {
     Route::apiResource('seance', \App\Http\Controllers\SeanceController::class);
         Route::post('/seance/salle/{salle_id}/filme/{film_id}', [SeanceController::class, 'store']);
 
-    Route::apiResource('reservation', \App\Http\Controllers\ReservationController::class);
-        Route::post('/reservation/seance/{seance_id}', [ReservationController::class, 'store']);
+    // Route::apiResource('reservation', \App\Http\Controllers\ReservationController::class);
+    //     Route::post('/reservation/seance/{seance_id}', [ReservationController::class, 'store']);
+
+});
+
+Route::middleware('auth:api')->group(function () {
+    Route::resource('reservations', ReservationController::class);
+
+    Route::post('/reservations', [ReservationController::class, 'store']); 
+    Route::put('/reservations/{id}', [ReservationController::class, 'update']); 
+    Route::post('/reservations/{id}/confirm', [ReservationController::class, 'confirm']); 
+    Route::delete('/reservations/{id}', [ReservationController::class, 'cancel']); 
+    Route::post('/payment/create-checkout-session', [PaymentController::class, 'createCheckoutSession']); 
+    Route::post('/payment/webhook', [PaymentController::class, 'handleWebhook']);
+
+    Route::get('/payment/success/{reservation_id}', [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
 
 });
 
 
-// Route::get('users', [UserController::class, 'index']);
+

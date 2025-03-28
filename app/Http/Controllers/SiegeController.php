@@ -27,28 +27,16 @@ class SiegeController extends Controller
         ], 200);
     }
 
-    public function store(Request $request , $salle_id)
+    public function store(Request $request)
     {
-
-
-        $data = $request->validate([
-            'numero' => 'required|integer',
-            'type' => 'in:solo,couple'
+        $validated = $request->validate([
+            'salle_id' => 'required|exists:salles,id',
+            'numero' => 'required|string|max:10',
+            'type' => 'required|in:standard,couple',
         ]);
 
-        $siege = $this->siegeService->create($data , $salle_id);
-
-        if (!$siege instanceof Siege) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create siege'
-            ],500);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $siege
-        ], 201);
+        $siege = $this->siegeService->create($validated);
+        return response()->json($siege, 201);
     }
 
     public function show(int $id)
@@ -94,12 +82,12 @@ class SiegeController extends Controller
     {
         $result = $this->siegeService->delete($id);
 
-        if (!is_bool($result)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete siege'
-            ],500);
-        }
+        // if (!is_bool($result)) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Failed to delete siege'
+        //     ],500);
+        // }
 
         return response()->json([
             'status' => 'success',

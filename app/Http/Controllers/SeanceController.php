@@ -92,12 +92,12 @@ class SeanceController extends Controller
     {
         $result = $this->seanceService->delete($id);
 
-        if (!is_bool($result)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete seance'
-            ],500);
-        }
+        // if (!is_bool($result)) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Failed to delete seance'
+        //     ],500);
+        // }
 
         return response()->json([
             'status' => 'success',

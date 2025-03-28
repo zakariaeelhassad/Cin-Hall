@@ -27,4 +27,9 @@ class Seance extends Model
     {
         return $this->belongsTo(Film::class);
     }
+
+    public function isVIP()
+    {
+        return $this->type === 'VIP'; // تأكد أن لديك عمود `type` في جدول `seances`
+    }
 }

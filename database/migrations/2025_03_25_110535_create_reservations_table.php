@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('reservations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('seance_id')->constrained('seance')->onDelete('cascade');
-            $table->json('seats'); // Stocke les sièges réservés sous forme de tableau JSON
-            $table->enum('status', ['pending', 'confirmed', 'cancelled']);
-            $table->timestamp('expiration_time'); 
+            $table->foreignId('user_id')->constrained('users');  
+            $table->foreignId('siege_id')->constrained('sieges'); 
+            $table->foreignId('seance_id')->constrained('seance'); 
+            $table->enum('status', ['pending', 'reserved', 'cancelled'])->default('pending'); 
             $table->timestamps();
         });
     }
