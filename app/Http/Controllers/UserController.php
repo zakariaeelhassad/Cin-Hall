@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends Controller
@@ -28,30 +29,39 @@ class UserController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $data = $request->validate([
-            'name' => 'required',
-            'email' => 'required|unique:users,email',
-            'password' => 'required',
-            'role' => 'in:admin,client'
+{
+    try {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'role' => 'required|in:admin,client'
         ]);
 
-        $user = $this->userService->create($data);
-        $token = JWTAuth::fromUser($user);
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password']),
+            'role' => $validatedData['role']
+        ]);
 
-        if (!$user instanceof User) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create user'
-            ],500);
-        }
+        $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'status' => 'success',
             'data' => $user,
-            'token'   => $token
+            'token' => $token
         ], 201);
+
+    } catch (\Exception $e) {
+        \Log::error('User Creation Error: ' . $e->getMessage());
+
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
     }
+}
 
     public function show(int $id)
     {

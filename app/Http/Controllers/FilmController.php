@@ -31,7 +31,7 @@ class FilmController extends Controller
         $data = $request->validate([
             'titre' => 'required|string',
             'description' => 'nullable|string',
-            'image' => 'nullable|string',
+            'image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'durée' => 'required|integer',
             'langue' => 'required|string',
             'age_min' => 'required|integer',
@@ -39,20 +39,35 @@ class FilmController extends Controller
             'genre' => 'required|string',
         ]);
 
-        $film = $this->filmService->create($data);
+        try {
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('films', 'public');
+                $data['image'] = $imagePath;
+            }
 
-        if (!$film instanceof Film) {
+            $film = $this->filmService->create($data);
+
+            if (!$film instanceof Film) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to create film'
+                ], 500);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Film créé avec succès',
+                'data' => $film
+            ], 201);
+
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Failed to create film'
-            ],500);
+                'message' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $film
-        ], 201);
     }
+
 
     public function show(int $id)
     {
